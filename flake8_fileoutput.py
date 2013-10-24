@@ -1,22 +1,36 @@
+from __future__ import print_function
 __version__ = '0.1'
 
 import pep8
 
 
-class FileOutputReport(pep8.BaseReport):
+class FileOutputReport(pep8.StandardReport):
     '''Output results to file.'''
 
     def __init__(self, options):
         super(FileOutputReport, self).__init__(options)
-        self._outputfile = options.fileoutput
+        self._file = open(options.fileoutput, 'w')
 
-    def error(self, line_number, offset, text, check):
-        '''Report an error, according to options.'''
-        code = super(FileOutputReport, self).error(line_number, offset, text, check)
-        with open(self._outputfile, 'a+') as f:
-            print 'hoi', line_number, offset, text, check
-            f.write("".join(line_number, offset, text, check))
-        return code
+    def get_file_results(self):
+        """Write the result to file."""
+        super(FileOutputReport, self).get_file_results()
+
+        for line_number, offset, code, text, doc in self._deferred_print:
+            print(self._fmt % {
+                'path': self.filename,
+                'row': self.line_offset + line_number, 'col': offset + 1,
+                'code': code, 'text': text,
+            }, file=self._file)
+            if self._show_source:
+                if line_number > len(self.lines):
+                    line = ''
+                else:
+                    line = self.lines[line_number - 1]
+                print(line.rstrip(), file=self._file)
+                print(' ' * offset + '^', file=self._file)
+            if self._show_pep8 and doc:
+                print(doc.lstrip('\n').rstrip(), file=self._file)
+        return self.file_errors
 
 
 class FileOutput(object):
