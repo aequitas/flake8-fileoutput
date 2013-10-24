@@ -4,7 +4,7 @@ import pep8
 
 
 class FileOutputReport(pep8.BaseReport):
-    '''Collect and print the results of the checks.'''
+    '''Output results to file.'''
 
     def __init__(self, options):
         super(FileOutputReport, self).__init__(options)
@@ -13,8 +13,9 @@ class FileOutputReport(pep8.BaseReport):
     def error(self, line_number, offset, text, check):
         '''Report an error, according to options.'''
         code = super(FileOutputReport, self).error(line_number, offset, text, check)
-        with open(self._outputfile, 'w') as f:
-            f.write(code)
+        with open(self._outputfile, 'a+') as f:
+            print 'hoi', line_number, offset, text, check
+            f.write("".join(line_number, offset, text, check))
         return code
 
 
