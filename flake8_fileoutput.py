@@ -13,7 +13,7 @@ class FileOutputReport(pep8.BaseReport):
     def error(self, line_number, offset, text, check):
         '''Report an error, according to options.'''
         code = super(FileOutputReport, self).error(line_number, offset, text, check)
-        with open(self._outputfile) as f:
+        with open(self._outputfile, 'w') as f:
             f.write(code)
         return code
 
